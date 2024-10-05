@@ -196,3 +196,10 @@ On iphone:
 - Long press, details, toggle Show in Share sheet
 
 
+Add to Web UI
+
+@app.route('/submit', methods=['GET'])
+def submit():
+    # Capture the URL sent from the shortcut
+    url = request.args.get('url')
+
