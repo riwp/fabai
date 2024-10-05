@@ -172,3 +172,6 @@ YouTube Search
 
 ChatGPT Agents
 - Get topics and sources to analyze 
+
+Mobile App shortcut:
+- make it east to send content to web app
