@@ -182,7 +182,7 @@ Dev in progress
 --------------------------------------------
 
 
-Create a Chrome Extension to mire easily pass web content to web app
+Create a Chrome Extension to more easily pass web content to web app
 
 Step 1: Set Up Your Extension Directory
 
