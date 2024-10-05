@@ -159,3 +159,10 @@ BASH Scripts
 - clean_dirs.sh cleans output directory contents
 - restart_services.sh reloads and re-starts services
 - restart_services.sh reloads and re-starts services
+
+--------------------------------------------
+Future Enhancements
+--------------------------------------------
+PDF to Text:
+- sudo apt install poppler-utils
+- pdftotext filename.pdf
