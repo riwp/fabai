@@ -175,3 +175,24 @@ ChatGPT Agents
 
 Mobile App shortcut:
 - make it east to send content to web app
+
+
+--------------------------------------------
+Dev in progress
+--------------------------------------------
+
+Safari shortcut - Send to Fab AI Web UI
+
+On iphone:
+- iPhone search for and open shortcuts app
+- Click + to create new shortcut
+- Rename to "Send to FabAI"
+- Add Action: Get URLs from input
+- Add action: Open URLs (configure below)
+- Tap URLs, 
+- enter http://[fabaiURL]:5005/submit?url=
+- tap Select Variable, then Shortcut Input
+- Click done
+- Long press, details, toggle Show in Share sheet
+
+
