@@ -166,5 +166,9 @@ Future Enhancements
 PDF to Text:
 - sudo apt install poppler-utils
 - pdftotext filename.pdf
+
 YouTube Search
 - Find topics to summarize and go summarize them
+
+ChatGPT Agents
+- Get topics and sources to analyze 
