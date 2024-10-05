@@ -181,25 +181,118 @@ Mobile App shortcut:
 Dev in progress
 --------------------------------------------
 
-Safari shortcut - Send to Fab AI Web UI
 
-On iphone:
-- iPhone search for and open shortcuts app
-- Click + to create new shortcut
-- Rename to "Send to FabAI"
-- Add Action: Get URLs from input
-- Add action: Open URLs (configure below)
-- Tap URLs, 
-- enter http://[fabaiURL]:5005/submit?url=
-- tap Select Variable, then Shortcut Input
-- Click done
-- Long press, details, toggle Show in Share sheet
+Create a Chrome Extension to mire easily pass web content to web app
 
+Step 1: Set Up Your Extension Directory
 
-Add to Web UI
+	1.	Create a New Folder: Name it something like MyChromeExtension.
+	2.	Create the Required Files:
+	•	Inside this folder, create the following files:
+	•	manifest.json
+	•	popup.html
+	•	popup.js
+	•	background.js (optional, for more complex interactions)
 
-@app.route('/submit', methods=['GET'])
-def submit():
-    # Capture the URL sent from the shortcut
-    url = request.args.get('url')
+Step 2: Create manifest.json
+
+This file is the metadata for your extension and tells Chrome how to load it.
+
+{
+  "manifest_version": 3,
+  "name": "My Chrome Extension",
+  "version": "1.0",
+  "description": "Capture URL and page content.",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
+
+Step 3: Create popup.html
+
+This is the HTML for the extension’s popup interface.
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Chrome Extension</title>
+    <script src="popup.js"></script>
+</head>
+<body>
+    <h1>Send Page Data</h1>
+    <button id="sendData">Send Data to AI Web App</button>
+</body>
+</html>
+
+Step 4: Create popup.js
+
+This script will handle capturing the URL and content of the page and sending it to your application.
+
+document.getElementById('sendData').addEventListener('click', async () => {
+    // Get the current tab
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    // Get the URL and content of the current page
+    const url = tab.url;
+    const content = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: () => document.body.innerText
+    });
+
+    // Send data to your web application
+    fetch('https://yourapp.com/submit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            url: url,
+            content: content[0].result // content[0].result contains the page content
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+
+Step 5: Create background.js (optional)
+
+If you want to handle background tasks or events, you can use this file. For basic operations, you might not need this yet.
+
+Step 6: Load the Extension in Chrome
+
+	1.	Open Chrome.
+	2.	Go to chrome://extensions.
+	3.	Enable Developer Mode (toggle on the top right).
+	4.	Click on “Load unpacked”.
+	5.	Select the folder you created for your extension (MyChromeExtension).
+
+Step 7: Test Your Extension
+
+	1.	Open any web page.
+	2.	Click the extension icon in the toolbar.
+	3.	Click the “Send Data to AI Web App” button.
+	4.	Check your console for success or error messages.
+
+Notes:
+
+	•	Icons: You can create icons of different sizes (16x16, 48x48, 128x128 pixels) and include them in your extension directory if you want custom icons. Update the manifest.json accordingly.
+	•	Permissions: Adjust permissions in the manifest.json as needed.
+	•	CORS: Ensure your web application allows requests from the Chrome extension’s origin if you encounter CORS issues.
 
