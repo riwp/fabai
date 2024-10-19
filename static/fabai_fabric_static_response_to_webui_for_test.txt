@@ -1,0 +1,99 @@
+- ## SUMMARY
+
+Justin Johnson, Fei-Fei Li, and Martin Casado discuss spatial intelligence, World Labs, and the future of AI.
+
+## IDEAS:
+
+- Deep learning algorithms can achieve amazing results when coupled with large amounts of data and compute.
+- The story of AI is intertwined with the story of compute, with advancements driving new possibilities.
+- New data sources, such as ImageNet and the internet, have played a crucial role in unlocking deep learning's potential.
+- Supervised learning, prevalent in the ImageNet era, relied heavily on human-labeled data for training.
+- Generative modeling, a more recent development, allows AI to create new content, such as images and text.
+- Spatial intelligence focuses on enabling machines to perceive, reason, and act in 3D space and time.
+- Spatial intelligence is considered as fundamental as language, potentially even more ancient and fundamental.
+- World Labs aims to unlock spatial intelligence, enabling machines to understand and interact with the 3D world.
+- Spatially intelligent models have the potential to revolutionize various fields, including gaming, augmented reality, and robotics.
+- World generation, a key application of spatial intelligence, involves creating interactive and vibrant 3D worlds.
+- Augmented reality, powered by spatial intelligence, can seamlessly blend virtual content with the physical world.
+- Robotics, another major application, can leverage spatial intelligence to enable robots to navigate and interact with the physical world.
+- World Labs, a deep tech company, focuses on building the foundational models and technologies for spatial intelligence.
+- Building spatial intelligence requires a multidisciplinary team with expertise in AI, computer graphics, systems engineering, and more.
+- The journey of developing spatial intelligence is expected to lead to unforeseen possibilities and advancements.
+- The magic of good technology lies in its ability to unlock new possibilities and expand the boundaries of what's imaginable.
+- The universe itself is a massive, evolving four-dimensional structure, and spatial intelligence aims to understand it in its entirety.
+- The advancement of spatial intelligence is a continuous journey, pushing the boundaries of our understanding and its applications.
+- Spatial intelligence has the potential to revolutionize how we interact with the world, blurring the lines between the real and virtual.
+- The development of spatial intelligence requires collaboration and the convergence of talent from diverse fields.
+- World Labs is committed to building a platform that enables the development and deployment of spatial intelligence across various domains.
+- The future of spatial intelligence holds immense potential, with applications that are currently beyond our imagination.
+- The pursuit of spatial intelligence is a testament to human curiosity and our desire to understand and interact with the world around us.
+
+## INSIGHTS:
+
+- Advancements in compute and the availability of large datasets have been key drivers of progress in AI.
+- The shift from supervised to generative modeling represents a significant paradigm shift in AI research.
+- Spatial intelligence is essential for machines to truly understand and interact with the world in a meaningful way.
+- The convergence of AI, computer graphics, and other fields is crucial for the development of spatial intelligence.
+- World Labs envisions a future where spatial intelligence transforms how we experience and interact with both the physical and virtual worlds.
+- The development of spatial intelligence is a complex and challenging endeavor that requires a multidisciplinary approach.
+- The potential applications of spatial intelligence are vast and far-reaching, extending beyond our current understanding.
+- The pursuit of spatial intelligence is a journey of continuous exploration and discovery, pushing the boundaries of what's possible.
+- The development of spatial intelligence has the potential to reshape our understanding of the universe and our place within it.
+- Spatial intelligence represents a fundamental shift in how we interact with technology, blurring the lines between the real and the digital.
+
+## QUOTES:
+
+- "You can get these amazingly powerful learning algorithms that are very generic couple them with very large amounts of compute couple them with very large amounts of data and magic things started to happen when you compi those ingredients."
+- "The big unlock is compute like I know the story of AI is of in the story of compute but even no matter how much people talk about it I I think people underestimate it right and the amount of the amount of growth that we've seen in computational power over the last decade is astounding"
+- "The bitter lesson says is if you make an algorithm don't be cute yeah just make sure you can take advantage of available compute because the available compute will show up right and so like you just like need to like why like on the other hand there's another narrative um which seems to me to be like just as credible which is like it's actually new data sources that unlock deep learning right"
+- "I think most people now are familiar with like quote the bitter lesson and the bitter lesson says is if you make an algorithm don't be cute yeah just make sure you can take advantage of available compute because the available compute will show up right and so like you just like need to like why like on the other hand there's another narrative um which seems to me to be like just as credible which is like it's actually new data sources that unlock deep learning right"
+- "Visual spatial intelligence is so fundamental it's as fundamental as language possibly more ancient and and more fundamental in certain ways so so it's very natural for me that um world Labs is our Northstar is to unlock spatial intelligence the moment to me is right to do it like Justin was saying compute we've got these ingredients we've got compute we've got a much deeper understanding of data way deeper than image that days you know uh compared to to that those days we're so much more sophisticated and we've got some advancement of algorithms including"
+- "Spatial intelligence is about machines ability to un to perceive reason and act in 3D and 3D space and time to understand how objects and events are positioned in 3D space and time how interactions in the world can affect those 3D position 3D 4D positions over space time um and both sort of perceive reason about generate interact with really take the machine out of the main frame or out of the data center and putting it out into the world and understanding the 3D 4D world with all of its richness so to be very clear are we talking about the physical world or are we just talking about an abstract notion of world I think it can be both I think it can be both and that encompasses our vision long term even if you're generating worlds even if you're generating content um doing that in positioned in 3D with 3D uh has a lot of benefits um or if you're recognizing the real world being able to put 3D understanding into the into the real world as well is part of it"
+- "I think talking about the 1D versus fundamental 3D representation is one of the most core differentiation the other thing it's a slightly philosophical but it's really important to for me at least is language is fundamentally a purely generated signal there's no language out there you don't go out in the nature and there's words written in the sky for you whatever data you feeding you pretty much can just somehow regurgitate with enough generalizability at the the same data out and that's language to language and but but 3D World Is Not There is a 3D world out there that follows laws of physics that has its own structures due to materials and and many other things and to to fundamentally back that information out and be able to represent it and be able to generate it is just fundamentally quite a different problem"
+- "I think this journey is going to take us places that we can't even imagine right now the magic of good technology is that technology opens up more possibilities and and unknown so so we will be pushing and then the possibilities will will be expanding"
+- "I I don't think going to get there um I I think that this is such a fundamental thing like the universe is a giant evolving four-dimensional structure and spatial intelligence r large is just understanding that in all of its depths and figuring out all the applications to that so I I think that we have a we have a particular set of ideas in mind today but I I think this I think this journey is going to take us places that we can't even imagine right now"
+
+## HABITS:
+
+- Fei-Fei Li is passionate about seeking and pursuing ambitious goals that advance the field of AI.
+- Justin Johnson dives deep into understanding algorithms, reimplementing them to gain a thorough grasp.
+- Fei-Fei Li emphasizes the importance of assembling a talented and multidisciplinary team.
+- Justin Johnson prioritizes staying up-to-date with the latest technological advancements and ordering new devices.
+- Fei-Fei Li believes in the power of collaboration and bringing together experts from various subdomains.
+
+## FACTS:
+
+- AlexNet, a deep neural network, significantly outperformed other algorithms in the 2012 ImageNet Challenge.
+- Convolutional neural networks, a key component of AlexNet, were first published in the 1980s.
+- The "bitter lesson" in AI suggests prioritizing algorithms that can leverage available compute power.
+- The availability of large datasets, like ImageNet, has been crucial for the success of deep learning.
+- Generative modeling has enabled AI to create new content, such as images, text, and videos.
+- Spatial intelligence focuses on enabling machines to understand and interact with the 3D world.
+- The human visual system primarily perceives 2D images, but our brains interpret them as projections of a 3D world.
+- AR/VR devices require spatial intelligence to seamlessly blend virtual content with the physical world.
+- Robotics can leverage spatial intelligence to enable robots to operate effectively in the real world.
+- World Labs is a deep tech company focused on building the foundational models for spatial intelligence.
+
+## REFERENCES:
+
+- AlexNet paper
+- "The Bitter Lesson"
+- ImageNet
+- Generative modeling
+- Diffusion models
+- NeRF (Neural Radiance Fields) paper
+- Vision Pro
+- Gaussian Splatting
+
+## ONE-SENTENCE TAKEAWAY:
+
+Spatial intelligence, powered by 3D representations, will unlock new possibilities for AI and its applications.
+
+## RECOMMENDATIONS:
+
+- Embrace the power of compute and leverage large datasets to drive progress in AI.
+- Explore the potential of generative modeling to create new content and experiences.
+- Focus on developing 3D representations to enable machines to understand and interact with the world.
+- Foster collaboration between AI researchers, computer graphics experts, and other disciplines.
+- Invest in building a strong team with diverse expertise to tackle the challenges of spatial intelligence.
+

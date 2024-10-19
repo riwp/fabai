@@ -1,0 +1,14 @@
+[Unit]
+Description=Web UI API for Fabric AI 
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/cmollo/fabai/aiwebui/aiwebui.py
+WorkingDirectory=/home/cmollo/fabai
+StandardOutput=journal
+StandardError=journal
+Restart=always
+User=cmollo
+
+[Install]
+WantedBy=multi-user.target

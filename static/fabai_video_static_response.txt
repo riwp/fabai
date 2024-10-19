@@ -1,0 +1,21 @@
+ONE SENTENCE SUMMARY: The next decade will be about AI agents that are trained like employees and will perform tasks and collaborate to achieve missions.
+
+MAIN POINTS:
+1. The tech industry is moving towards an industry of skills.
+2. AI agents will sit on top of tools and use them to solve problems.
+3. Agents will be able to reason, collaborate, and communicate with each other.
+4. Users will be able to give feedback to agents, helping improve prompts and output.
+5. Onboarding agents will be more like onboarding employees than writing software.
+6. Users will be able to communicate with agents, giving missions and showing examples.
+7. Agents will be able to ask clarifying questions and request additional examples.
+8. There will be specialized agents with expertise in particular skills and access to certain information.
+9. General-purpose agents will be able to reason about tasks and break down missions into smaller steps.
+10. AI is advancing rapidly, enabling breakthroughs in fields like digital biology and disease diagnosis.
+
+TAKEAWAYS:
+1. AI agents represent a significant shift in the tech industry, moving from tools to skills.
+2. The interaction with AI agents will be more human-like, involving communication, feedback, and collaboration.
+3. AI agents will automate tasks and augment human capabilities, leading to increased efficiency and productivity.
+4. The next decade will be marked by rapid advancements in AI, leading to breakthroughs in various fields.
+5. AI agents will be integrated into various aspects of life, from education to scientific research and company operations. 
+

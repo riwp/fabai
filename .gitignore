@@ -1,0 +1,14 @@
+*.pyc
+__pycache__/
+node_modules/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.vscode/
+.DS_Store
+*.log
+out/text/*
+out/video/*
+out/web/*
+*.local

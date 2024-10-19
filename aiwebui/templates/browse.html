@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Browser</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+        }
+        .form-group {
+            width: 100%;
+        }
+        #fileContent {
+            width: 100%;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            font-size: 1.2rem;
+            margin-top: 0;
+            padding-top: 10px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            padding: 10px;
+        }
+        label {
+            font-size: 1.25rem;
+        }
+        .form-control {
+            font-size: 1.2rem;
+        }
+        select.form-control {
+            height: calc(2.5rem + 2px);
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+            #fileContent {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <script>
+        // Function to fetch file content
+        function fetchFileContent() {
+            const file = document.getElementById('file').value;
+            const category = document.getElementById('category').value;
+
+            if (!file) {
+                return; // Do nothing if no file is selected
+            }
+
+            fetch(`/files/${encodeURIComponent(category)}/${encodeURIComponent(file)}/content`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('fileContent').textContent = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching file content:', error);
+                });
+        }
+
+        // Reload the page with the new category, then fetch the file content
+        function fetchFiles() {
+            const category = document.getElementById('category').value;
+            window.location.href = `/browse?category=${category}`;
+        }
+
+        // Trigger the file content fetch when the file changes
+        function handleFileChange() {
+            fetchFileContent();
+        }
+
+        // Wait until the DOM is fully loaded, then fetch the content of the first file automatically
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileDropdown = document.getElementById('file');
+            if (fileDropdown) {
+                fetchFileContent(); // Fetch content for the first file if it exists
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">File Browser</h1>
+        <a href="/" class="btn btn-secondary btn-block">Back to Home</a>
+
+        <!-- Dropdown to select category (Video, Web, Text) -->
+        <form method="GET" action="/browse">
+            <div class="form-group">
+                <label for="category">Select Category:</label>
+                <select name="category" id="category" onchange="fetchFiles()" required>
+                    <option value="video" {% if selected_category == 'video' %} selected {% endif %}>Video</option>
+                    <option value="web" {% if selected_category == 'web' %} selected {% endif %}>Web</option>
+                    <option value="text" {% if selected_category == 'text' %} selected {% endif %}>Text</option>
+                </select>
+            </div>
+        </form>
+
+        <br>
+
+        <!-- Form for renaming files -->
+        <form action="/rename" method="POST">
+            <div class="form-group">
+                <label for="file">Select File to Rename:</label>
+                <select name="oldname" id="file" onchange="handleFileChange()" required>
+                    {% for file in files %}
+                    <option value="{{ file }}">{{ file }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Area to display file content -->
+            <h2>File Content:</h2>
+            <pre id="fileContent"></pre>
+
+            <div class="form-group">
+                <label for="newname">New Name:</label>
+                <input type="text" id="newname" name="newname" required class="form-control">
+            </div>
+
+            <!-- Hidden field to pass the selected category -->
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            <input type="hidden" name="currentfiledirectory" value="{{ currentfiledirectory }}">
+
+            <button type="submit" class="btn btn-success">Rename File</button>
+        </form>
+
+        <!-- Optionally display messages -->
+        {% if message %}
+            <p>{{ message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[Unit]
+Description=Main Fabric API Entry Point for all functions
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/cmollo/fabai/api/fabai_get_ai_insights.py
+WorkingDirectory=/home/cmollo/fabai
+StandardOutput=journal
+StandardError=journal
+Restart=always
+User=cmollo
+
+[Install]
+WantedBy=multi-user.target

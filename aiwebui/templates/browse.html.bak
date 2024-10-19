@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>File Browser</title>
+        <script>
+            // Fetch description when file is selected
+            function fetchDescription() {
+                const file = document.getElementById('file').value;
+
+                if (!file) {
+                    alert('Please select a file to get a description.');
+                    return;
+                }
+                
+                console.log(`Fetching description for file: ${file}`);
+                
+                fetch(`/files/${encodeURIComponent(file)}/description`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch description: ' + response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Fetched description:", data);
+                        document.getElementById('description').value = data.description || 'No description available.';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching description:', error);
+                        document.getElementById('description').value = 'Error fetching description.';
+                    });
+            }
+    
+            // Reload the page with the new category, then fetch the description
+            function fetchFiles() {
+                const category = document.getElementById('category').value;
+                window.location.href = `/browse?category=${category}`;
+            }
+
+            // Trigger the description fetch when the file changes
+            function handleFileChange() {
+                fetchDescription();
+            }
+
+
+
+// Function to fetch file content
+    function fetchFileContent() {
+        const file = document.getElementById('file').value;
+        const category = document.getElementById('category').value;
+
+        if (!file) {
+            alert('Please select a file to view its content.');
+            return;
+        }
+
+        fetch(`/files/${encodeURIComponent(category)}/${encodeURIComponent(file)}/content`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('fileContent').textContent = data;
+            })
+            .catch(error => {
+                console.error('Error fetching file content:', error);
+                alert('Error fetching file content: ' + error.message);
+            });
+    }
+
+
+function updateDescription(event) {
+    event.preventDefault(); // Prevent default form submission
+             
+    const file = document.getElementById('file').value;
+    const description = document.getElementById('description').value;
+    const category = document.getElementById('category').value; // Get the selected category
+             
+    if (!file || !description) {
+        alert('Please select a file and provide a description.');
+        return;
+    }
+             
+    // Make a POST request to update the description
+    fetch(`/files/${encodeURIComponent(file)}/description`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ category, description }) // Send both category and description
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert(data.message);
+        fetchDescription(); // Refresh the description if needed
+    })
+    .catch(error => {
+        console.error('Error updating description:', error);
+        alert('Error updating description: ' + error.message);
+    });
+}
+
+
+
+            // Wait until the DOM is fully loaded, then fetch the description of the first file automatically
+            document.addEventListener('DOMContentLoaded', function () {
+                const fileDropdown = document.getElementById('file');
+                if (fileDropdown) {
+                    // Trigger the description fetch for the first file
+                    fetchDescription();
+                }
+            });
+        </script>
+    </head>
+    
+<body>
+
+<h1>File Browser</h1>
+
+<a href="/" class="btn btn-secondary btn-block">Back to Home</a>
+
+<!-- Dropdown to select category (Video, Web, Text) -->
+<form method="GET" action="/browse">
+    <label for="category">Select Category:</label>
+    <select name="category" id="category" onchange="fetchFiles()">
+        <option value="video" {% if selected_category == 'video' %} selected {% endif %}>Video</option>
+        <option value="web" {% if selected_category == 'web' %} selected {% endif %}>Web</option>
+        <option value="text" {% if selected_category == 'text' %} selected {% endif %}>Text</option>
+    </select>
+</form>
+
+<br><br>
+
+<!-- Form for renaming files and updating descriptions -->
+<form action="/rename" method="POST">
+    <label for="file">Select File to Rename:</label>
+    <select name="oldname" id="file" onchange="handleFileChange()">
+        {% for file in files %}
+        <option value="{{ file }}">{{ file }}</option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+<!-- View Button to fetch file content -->
+<button type="button" onclick="fetchFileContent()">View File Content</button>
+
+<!-- Area to display file content -->
+<h2>File Content:</h2>
+<pre id="fileContent" style="border: 1px solid #ccc; padding: 10px; background: #f9f9f9;"></pre>
+
+
+    <!-- Display the file's description -->
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" rows="4" cols="50" required></textarea>
+
+    <br><br>
+
+    <label for="newname">New Name:</label>
+    <input type="text" id="newname" name="newname" required>
+
+    <!-- Hidden field to pass the selected category -->
+    <input type="hidden" name="category" value="{{ selected_category }}">
+
+    <br><br>
+
+    <button type="submit">Rename File</button>
+</form>
+
+<!-- Button to update the description -->
+<button type="button" onclick="updateDescription(event)">Update Description</button>
+
+<!-- Optionally display messages -->
+{% if message %}
+    <p>{{ message }}</p>
+{% endif %}
+
+</body>
+</html>
