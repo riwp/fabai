@@ -1,48 +1,25 @@
 #!/bin/bash
 
-# Change to the directory of your project
-cd /home/cmollo/fabai || exit
+LOCAL_REPO_PATH="/home/cmollo/fabai"
+cd "$LOCAL_REPO_PATH" || exit
 
-# Remove existing git directory if found
-if [ -d ".git" ]; then
-    echo "Existing Git repository found. Removing..."
-    rm -rf .git
-fi
+USR_NAME="riwp"
+git config --global user.name "$USR_NAME"
 
-# Initialize a new Git repository
-echo "Initializing new Git repository..."
-git init
+E_MAIL="europac197@gmail.com"
+git config --global user.email "$E_MAIL"
 
-# Add all files to the repository
-echo "Adding all files to the repository..."
-git add .
-
-# Prompt for commit message
-#read -p "Enter commit message: " commit_message
-
-# Commit changes
-#git commit -m "$commit_message"
-git commit -m "init"
-
-# Variables
 REPO_NAME="fabai"  # Change this to your desired repository name
-GITHUB_USERNAME="riwp"  # Replace with your GitHub username
+gh repo create "$REPO_NAME" --public
 
-# Create GitHub repository if it doesn't exist
-REPO_CHECK=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/repos/$GITHUB_USERNAME/$REPO_NAME")
+ORIGN_URL="https://github.com/riwp/fabai.git"
+git remote set-url origin "$ORIGN_URL"
 
-if [ "$REPO_CHECK" -eq 404 ]; then
-    echo "Repository not found. Creating repository..."
-    curl -s -u "$GITHUB_USERNAME" "https://api.github.com/user/repos" -d "{\"name\":\"$REPO_NAME\"}"
-else
-    echo "Repository already exists."
-fi
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git push -u origin main
 
-# Add remote origin using SSH
-git remote add origin "git@github.com:$GITHUB_USERNAME/$REPO_NAME.git"
-
-# Push changes to the remote repository
-echo "Pushing changes to the remote repository..."
-git push -u origin master --force
 
 echo "All local files have been pushed successfully."
