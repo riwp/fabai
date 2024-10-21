@@ -90,45 +90,19 @@
                 <div class="error-message" id="urlError">URL is required for AIWeb and AIVideo.</div>
             </div>
             <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Let's Go</button>
-
-            <div class="form-group" id="filenamegroup">
-                <label for="newfilename">File Name:</label>
-                <input type="text" id="newfilename" name="newfilename" value="{{ filename }}">   
-                <input type="hidden" name="currentfilename" value="{{ currentfilename }}">
-                <input type="hidden" name="currentfiledirectory" value="{{ currentfiledirectory }}">
-            </div>
-
-            <div class="form-group" id="notegroup"></div>
-                <!-- File Name Input -->
-                <label for="file_name">File Name:</label>
-                <input type="text" id="file_name" name="file_name" required>
-                <br>
+        </form>
         
-                <!-- Note Header Input -->
-                <label for="note_header">Note Header:</label>
-                <input type="text" id="note_header" name="note_header" required>
-                <br>
-        
-                <!-- Tags Input -->
-                <label for="tags">Tags (comma-separated):</label>
-                <input type="text" id="tags" name="tags" placeholder="e.g., tag1, tag2" required>
-                <br>
-        
-                <!-- Related Notes Input -->
-                <label for="related_notes">Related Notes (comma-separated):</label>
-                <input type="text" id="related_notes" name="related_notes" placeholder="e.g., note1, note2" required>
-                <br>
-        
-                <!-- Result (Note Content) -->
-                <label for="result">Note Content:</label>
-                <textarea id="note_content" name="note_content" rows="4" cols="50" required></textarea>
-        
-                <br>
-        
-                <!-- Save Button -->
-                <button type="button" onclick="saveNote()">Save Note</button>
-            </div>
-
+        <form id="renameForm" action="/rename" method="POST">
+            <label for="newfilename">File Name:</label>
+            <input type="text" id="newfilename" name="newfilename" required value="{{ filename }}">   
+            <input type="hidden" name="operationtype" value="{{ operationtype }}">
+            <input type="hidden" name="function" value="{{ function }}">
+            <input type="hidden" name="textInput" value="{{ textInput }}">
+            <input type="hidden" name="url" value="{{ url }}">
+            <input type="hidden" name="currentfilename" value="{{ currentfilename }}">
+            <input type="hidden" name="currentfiledirectory" value="{{ currentfiledirectory }}">
+            <input type="hidden" name="result" value="{{ result }}"> <!-- Add any additional fields needed -->
+            <button type="submit">Rename File</button>
         </form>
         
         <div id="result">{{ result }}</div>
@@ -201,6 +175,24 @@
                             console.log("Current Filename:", currentfilename);
                             console.log("Current File Directory:", currentfiledirectory);
 
+                            // Set values for the rename form
+                            document.getElementById('newfilename').value = currentfilename; // Set new filename
+                            document.querySelector('input[name="currentfilename"]').value = currentfilename; // Set current filename
+                            document.querySelector('input[name="currentfiledirectory"]').value = currentfiledirectory; // Set current directory
+                            
+                            // Add these lines to set other values from apiForm
+                            document.querySelector('input[name="operationtype"]').value = document.getElementById('operationtype').value; // Pass operation type
+                            document.querySelector('input[name="function"]').value = document.getElementById('function').value; // Pass function
+                            document.querySelector('input[name="textInput"]').value = document.getElementById('textInput').value; // Pass text input
+                            document.querySelector('input[name="url"]').value = document.getElementById('url').value; // Pass URL
+
+                            // Log all values being set to the rename form
+                            console.log("Renaming Values:");
+                            console.log("Operation Type:", document.querySelector('input[name="operationtype"]').value);
+                            console.log("Function:", document.querySelector('input[name="function"]').value);
+                            console.log("Text Input:", document.querySelector('input[name="textInput"]').value);
+                            console.log("URL:", document.querySelector('input[name="url"]').value);
+
                             // Update the resultDiv with the output value
                             resultDiv.innerHTML = result.output || 'No output received.';
                         }
@@ -211,39 +203,6 @@
                 }
             };
         });
-
-        function saveNote() {
-            let file_name = document.getElementById('file_name').value;
-            let note_header = document.getElementById('note_header').value;
-            let note_content = document.getElementById('result').value;  // This is now 'result'
-            let tags = document.getElementById('tags').value;
-            let related_notes = document.getElementById('related_notes').value;
-        
-            // Send form data via AJAX to the submit_note route
-            fetch('/submit_note', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    'file_name': file_name,
-                    'note_header': note_header,
-                    'note_content': note_content,  // Ensure this is correct
-                    'tags': tags,
-                    'related_notes': related_notes
-                })
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.status === 'success') {
-                      alert('Note saved successfully!');
-                  } else {
-                      document.getElementById('errorMessage').textContent = 'Error: ' + data.message;
-                  }
-              }).catch(error => {
-                  document.getElementById('errorMessage').textContent = 'Error saving note: ' + error;
-              });
-        }
-
     </script>
 </body>
 </html>

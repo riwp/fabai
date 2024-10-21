@@ -14,3 +14,11 @@ OUT_DIRECTORIES = {
     'web': '/home/cmollo/fabai/out/web/',
     'text': '/home/cmollo/fabai/out/text/'
 }
+
+
+FABRIC_AI_API_URL='http://localhost:5006/get_ai_insights'
+OBSIDIAN_API_PATH='http://localhost:5006/save_to_obsidian'
+
+OBSIDIAN_VAULT_PATH='/home/cmollo/Documents/Obsidian Vault'
+
+

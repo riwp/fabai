@@ -106,9 +106,15 @@ def get_fabric_insights_from_text(function, operation_type, base_filename, text_
 #add entry point that can be called via CURL to test in isolation
 @app.route('/test_get_webpage_as_text', methods=['POST'])
 def test_get_fabric_insights_from_text():
+    
+    
+    
+    function = request.json.get('function')
     operation_type = request.json.get('operation_type')
+    operation_type = request.json.get('operation_type')
+    base_filename = request.json.get('base_filename')
     text_content = request.json.get('text_content')
-    return get_fabric_insights_from_text(operation_type, text_content)
+    return get_fabric_insights_from_text(function, operation_type, base_filename, text_content)
 
 #if __name__ == '__main__':
 #    app.run(host='0.0.0.0', port=PORT_NUMBER)

@@ -5,6 +5,8 @@ import random
 # Add the parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from common.fabai_common_variables import *
+
 #import common variables, classes
 from api.fabai_common import *
 
@@ -20,6 +22,7 @@ from fabai_get_youtubevideo_transcript import *
 #code to call fabric and get insights
 from fabai_get_fabric_insights_from_text import *
 
+from obsidian_note import *
 
 app = Flask(__name__)
 
@@ -101,13 +104,30 @@ def get_AI_Insights():
 
 
 
+@app.route('/save_to_obsidian', methods=['POST'])
+def save_to_obsidian():
+    data = request.json
 
+    # Path to Obsidian vault to save file
+    vault_path = OBSIDIAN_VAULT_PATH
 
+    # Retrieve parameters
+    file_name = data.get('file_name')
+    note_header = data.get('note_header')
+    note_content = data.get('note_content')
+    tags = data.get('tags')
+    related_notes = data.get('related_notes')
 
+    # Validate required parameters
+    if not file_name or not note_header or not note_content:
+        app.logger.error("Missing required parameters: file_name, note_header, or note_content.")
+        return {"status": "error", "message": "Missing required parameters."}, 400
 
-
-
-
+    # Create the note
+    if create_note(vault_path, file_name, note_header, note_content, tags=tags, related_notes=related_notes):
+        return {"status": "success", "message": "Note created."}, 201
+    else:
+        return {"status": "error", "message": "Failed to create note."}, 500
 
 
 
