@@ -1,14 +1,15 @@
 #!/bin/bash
 
 # Define the URL
-URL="http://localhost:5006/test_get_webpage_as_text"
+URL="http://localhost:5006/get_ai_insights"
 
 JSON_PAYLOAD=$(cat <<EOF
 {
-  "function": "textInput",
-  "operation_type": "summary",
-  "base_filename": "test_get_webpage_as_text",
-  "text_content": "This is a test content."
+  "function": "aivideo", 
+  "operationtype": "summary",
+  "url": "https://youtu.be/7vVWFTzOt24?si=7TcZWf125rO2UY7_",
+  "text_input": "",
+  "filename": "test_video"
 }
 EOF
 )

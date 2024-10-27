@@ -26,9 +26,6 @@ app = Flask(__name__)
 # Get the current directory
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
-#location to write logs to
-LOG_PATH = os.path.join(current_directory, 'fabai_api.log')
-
 #location for output of web content
 OUTPUT_DIR_WEB = os.path.join(current_directory, '..', 'out', 'web')
 os.makedirs(OUTPUT_DIR_WEB, exist_ok=True)
@@ -41,16 +38,8 @@ os.makedirs(OUTPUT_DIR_VIDEO, exist_ok=True)
 OUTPUT_DIR_TEXT = os.path.join(current_directory, '..', 'out', 'text')
 os.makedirs(OUTPUT_DIR_TEXT, exist_ok=True)
 
-
 #location for static content when in debug mode to avoid hitting AI server
 DEBUG_STATIC_VIDEO_FILE = os.path.join(current_directory, '..', 'static', 'fabai_video_static_response.txt')
-
-# Setup logging to log to a file
-logging.basicConfig(
-    filename=os.path.expanduser(LOG_PATH),
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
 # set up key/value pair to allow short hand for fabric ai patterns
 operation_mapping = {

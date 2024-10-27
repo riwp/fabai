@@ -74,86 +74,10 @@
             border: 1px solid #ccc;
             margin-bottom: 10px;
         }
-        /* Modal background */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-        }
-        
-        /* Modal content */
-        .modal-content {
-            position: relative;
-            margin: 10% auto;
-            padding: 20px;
-            width: 400px; /* Increase width for a wider window */
-            background-color: #fff;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Title styling - smaller font size */
-        #alertTitle {
-            font-size: 22px; /* Smaller title font */
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        /* Message styling - larger font size */
-        #alertMessage {
-            font-size: 18px; /* Larger message font */
-            color: #555;
-            margin-bottom: 20px;
-        }
-        
-        /* Close button */
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            cursor: pointer;
-            color: #888;
-        }
-        
-        .close-btn:hover {
-            color: #000;
-        }
-        
-        /* Button styling */
-        .modal-content button {
-            padding: 8px 16px;
-            font-size: 16px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .modal-content button:hover {
-            background-color: #0056b3;
-        }
-    
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="customAlert" class="modal">
-            <div class="modal-content">
-              <span class="close-btn" onclick="closeAlert()">&times;</span>
-              <h2 id="alertTitle">Alert Title</h2>
-              <p id="alertMessage">Alert message goes here.</p>
-              <button onclick="closeAlert()">OK</button>
-            </div>
-          </div>          
         <h1 class="text-center">Let's analyze some content</h1>
         <form id="apiForm">
                 <div id="ai-inputs" class="general-content">
@@ -287,159 +211,166 @@
 
 
 
-        function validateFormSubmission(selected_operationtype, selected_function, selected_text, selected_url) {
-            // Declare array to store errors during validation
+
+        function validateFormSubmission(selected_operationtype, selected_function, selected_text, selected_url)
+        {
+
+            //track whether form is valid
+            let valid = true; 
+
+            //Declare array to store errors during validation
             let error_message = [];
-        
-            // Validate operation type was selected
+
+            //validate operation type was selected
             if (!selected_operationtype.value) {
                 error_message.push("Operation Type is required.");
+                //form is not valid
+                valid = false;
             }
         
-            // Perform validation based on selected function
-            switch (selected_function.value) {
+            //perform validation based upopn which function was selected
+            switch(selected_function.value) {
                 case 'textInput':
-                    // Validate text input
+                    //if text is not selected
                     if (!selected_text.value) {
-                        error_message.push("Text input is required.");
+                        error_message.push("Text input is required");
+                        //form is not valid
+                        valid = false;
                     }
                     break;
                 case 'static':
-                    // Static case has no required fields, so no need to push errors
+                    //form is valid for static, no other required fields
+                    valid = true;
                     break;
-                default: // aiWeb or aiVideo cases
-                    // Ensure URL was entered
+                default: //aiWeb or aiVideo are left
+                
+                    //Make sure URL was entered
                     if (!selected_url.value) {
-                        error_message.push("URL is required.");
+                        error_message.push("URL is required");
+                        //form is not valid
+                        valid = false;
                     }
                     break;
             }
-        
-            // Return array of error messages
-            return error_message;
+
+            //return error message 
+            return error_message
+
         }
+
         
-        function submitForm() {
-            // Hide note section initially
+        function submitForm() 
+        {
+            // Hide note group initially
             setVisibility('save-note', 'hide');
 
-            // Clear previous results
-            document.getElementById('file_name').value = '';
-            document.getElementById('note_header').value = '';
-            document.getElementById('tags').value = '';
-            document.getElementById('related_notes').value = '';
-            document.getElementById('note_content').value = '';
-
-            document.querySelector('input[name="currentfilename"]').value = '';
-            document.querySelector('input[name="currentfiledirectory"]').value = '';
-            document.querySelector('input[name="fullPath"]').value = '';
-        
-            // Get form elements
+            //get form elements needed
             const form = document.getElementById('apiForm');
             const submitBtn = document.getElementById('submitBtn');
-        
-            // Key input fields
+
+            // Clear the result
+            document.getElementById('note_content').value = ''; // Consider where this should be cleared
+
+            //key input fields
             const selected_operationtype = document.getElementById('operationtype');
             const selected_function = document.getElementById('function');
             const selected_text = document.getElementById('textInput');
             const selected_url = document.getElementById('url');
-        
-            // Log for debugging
+
+       
+            //update the logs pre-validation
             console.log('Validating inputs');
-        
-            // Validate the form and collect any errors
-            let error_message = validateFormSubmission(selected_operationtype, selected_function, selected_text, selected_url);
-        
-            // If there are any errors, display them and prevent form submission
+
+            //track whether form is valid
+            let valid = true; 
+
+            //validate the form and collect any errors
+            let error_message = validateFormSubmission(selected_operationtype, selected_function, selected_text, selected_url)
+
+            //if there are any errors
             if (error_message.length > 0) {
                 let errorMessageString = error_message.join("\n"); // Join messages with newline
-                showAlert('Missing Required Fields', errorMessageString);
-                return; // Stop execution if there are validation errors
+                alert(errorMessageString); // Display to user
+                valid = false; // Prevent form submission if errors exist
             }
+            else {
+                valid = true;
+            }
+            
+            //if the form passed validation
+            if (valid) {
+
+                //Log to console for debugging
+                console.log('Inputs validated successfully');
         
-            // If form is valid, proceed
-            console.log('Inputs validated successfully');
+                //get form data
+                const formData = new FormData(form);
+
+                //Let the user know your working on the request and disable button
+                submitBtn.textContent = 'Working on it...';
+                submitBtn.disabled = true;
         
-            // Get form data
-            const formData = new FormData(form);
-            const formDataObj = Object.fromEntries(formData);
+                //Log for debugging
+                console.log('Fetching data');
         
-            // Inform user and disable submit button
-            submitBtn.textContent = 'Working on it...';
-            submitBtn.disabled = true;
+                //Execute the api call
+                fetch('/submit', {
+                    method: 'POST',
+                    body: JSON.stringify(Object.fromEntries(formData)),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    console.log("Raw response:", response); // Log the response
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+
+                    //log data to console for debugging
+                    console.log("Data processed:", result);
         
-            console.log('Fetching data');
+
+                    if (result.error) {
+                        alert('Web Service Call Error:' + result.error);
+                    } else {
+
+                        //Get the file name
+                        const fullPath = result.filename;
+                        const lastSlashIndex = fullPath.lastIndexOf('/');
         
-            // Execute the API call
-            fetch('/submit', {
-                method: 'POST',
-                body: JSON.stringify(formDataObj),
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                console.log("Raw response:", response); // Log the response
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(result => {
-                console.log("Data processed:", result); // Log for debugging
+                        //Get the directory
+                        const currentFileDirectory = lastSlashIndex !== -1 ? fullPath.substring(0, lastSlashIndex) : '';
+                        const currentFileName = lastSlashIndex !== -1 ? fullPath.substring(lastSlashIndex + 1) : fullPath;
         
-                if (result.error) {
-                    showAlert('Web Service Error', result.error);
-                } else {
-                    // Get the file path and name
-                    const fullPath = result.filename;
-                    const lastSlashIndex = fullPath.lastIndexOf('/');
-                    const currentFileDirectory = lastSlashIndex !== -1 ? fullPath.substring(0, lastSlashIndex) : '';
-                    const currentFileName = lastSlashIndex !== -1 ? fullPath.substring(lastSlashIndex + 1) : fullPath;
+                        // Set the hidden input values for currentfilename and currentfiledirectory
+                        document.querySelector('input[name="fullPath"]').value = fullPath;
+                        document.getElementById('file_name').value = currentFileName;
         
-                    // Set hidden input values
-                    document.querySelector('input[name="fullPath"]').value = fullPath;
-                    document.getElementById('file_name').value = currentFileName;
-        
-                    // Update note content with output value
-                    document.getElementById('note_content').value = result.output || 'No output received.';
-        
-                    // Show note section
-                    setVisibility('save-note', 'show');
-                }
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                showAlert('Error in Fetch Operation', 'An error occurred. Please try again' + error);
-            })
-            .finally(() => {
-                // Reset button
-                submitBtn.textContent = "Let's Go";
-                submitBtn.disabled = false;
-            });
+                        // Update the note content with the output value                        
+                        document.getElementById('note_content').value = result.output || 'No output received.';
+                        
+                        //alert(document.getElementById('note_content').value)
+
+                        // Show note group
+                        setVisibility('save-note', 'show');
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    alert('An error occurred. Please try again.');
+                    //document.getElementById('note_content').value = 'An error occurred. Please try again.';
+                })
+                .finally(() => {
+                    submitBtn.textContent = "Let's Go";
+                    submitBtn.disabled = false;
+                });
+            }
         }
         
-        
-
-
-        function validateSaveNote(file_name, note_header, tags, related_notes, note_content) {
-
-            // Declare array to store errors during validation
-            let error_message = [];
-        
-            // if file name was not specified
-            if (!file_name){
-                error_message.push("File name is required");
-            }
-
-            // if file name was not specified
-            if (!note_content){
-                error_message.push("Note content is required");
-            }
-
-            // Return array of error messages
-            return error_message;
-        }
        
 
         function saveNote() {
@@ -449,16 +380,8 @@
             const related_notes = document.getElementById("related_notes").value;
             const note_content = document.getElementById("note_content").value;
 
-       
-            // Validate the form and collect any errors
-            let error_message = validateSaveNote(file_name, note_header, tags, related_notes, note_content);
-        
-            // If there are any errors, display them and prevent form submission
-            if (error_message.length > 0) {
-                let errorMessageString = error_message.join("\n"); // Join messages with newline
-                alert(errorMessageString); // Display to user
-                return; // Stop execution if there are validation errors
-            }
+            //alert(`fileName: ${file_name}, noteHeader: ${note_header}, noteContent: ${note_content}`);
+            //alert(`tags: ${tags}, relatedNotes: ${note_content}`);
 
             // Send form data via AJAX to the submit_note route
             fetch('/submit_note', {
@@ -476,13 +399,14 @@
             }).then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        showAlert('Success!', 'Your note saved successfully')
+                        alert('Note saved successfully!');
                     } else {
                         document.getElementById('errorMessage').textContent = 'Error: ' + data.message;
                     }
                 }).catch(error => {
                     document.getElementById('errorMessage').textContent = 'Error saving note: ' + error;
                 });
+
         }
 
 
@@ -503,16 +427,6 @@
         }
 
 
-        function showAlert(title, message) {
-            document.getElementById('alertTitle').innerText = title;
-            document.getElementById('alertMessage').innerText = message;
-            document.getElementById('customAlert').style.display = 'block';
-        }
-        
-        function closeAlert() {
-            document.getElementById('customAlert').style.display = 'none';
-        }
-        
 
 
     </script>

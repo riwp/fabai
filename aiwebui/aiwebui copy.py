@@ -8,13 +8,13 @@ import json
 # Add the parent directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import common.fabai_common_variables
+from common.fabai_common_variables import *
 
 # Code to get static text file and returns as stub for testing purposes
 from common.fabai_get_static_debug_data import *
 
 # For UI troubleshooting. Return static response as if you called fabric AI
-DEBUG_STATIC_FABRIC_RESPONSE = common.fabai_common_variables.DEBUG_STATIC_FABRIC_RESPONSE_VALUE
+DEBUG_STATIC_FABRIC_RESPONSE = DEBUG_STATIC_FABRIC_RESPONSE_VALUE
 
 # Get the current directory
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -25,9 +25,9 @@ DEBUG_STATIC_FABRIC_FILE = os.path.join(current_directory, '..', 'static', 'faba
 
 
 # Allow toggle on/off debugging from IDE
-DEBUG_CODE = common.fabai_common_variables.DEBUG_CODE_VALUE
+DEBUG_CODE = DEBUG_CODE_VALUE
 if DEBUG_CODE:
-    DEBUG_PORT = common.fabai_common_variables.DEBUG_PORT_AIWEBUI_VALUE
+    DEBUG_PORT = DEBUG_PORT_AIWEBUI_VALUE
     import debugpy
     # Listen for the VS Code debugger to attach on port 5678
     debugpy.listen(("0.0.0.0", DEBUG_PORT))
@@ -49,15 +49,12 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-# URL for the new api_fabricAI service
-#FABRIC_AI_API_URL='http://localhost:5006/get_ai_insights'
-
-# Path to store metadata (you can choose where to store the descriptions)
-METADATA_FILE = common.fabai_common_variables.OUT_FILES_METADATA
 
 @app.route('/')
 def index():
+    #app.logger.info(f'current_directory: {current_directory}')
     app.logger.info("Rendering index.html")
+   
     return render_template('index.html')
 
 
@@ -275,10 +272,14 @@ def update_description(filename):
         app.logger.error(f"Error updating description: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+video_directory = os.path.join(current_directory, '..', 'out/video/')
+web_directory = os.path.join(current_directory, '..', 'out/web/')
+text_directory = os.path.join(current_directory, '..', 'out/text/')
+
 OUT_DIRECTORIES = {
-    'video': '/home/cmollo/fabai/out/video/',
-    'web': '/home/cmollo/fabai/out/web/',
-    'text': '/home/cmollo/fabai/out/text/'
+    'video': video_directory,
+    'web': web_directory,
+    'text': text_directory
 }
 
 @app.route('/files/<string:category>/<string:filename>/content', methods=['GET'])
@@ -300,39 +301,44 @@ def get_file_content(category, filename):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/save_to_obsidian', methods=['POST'])
-def save_to_obsidian():
-    # Get parameters
-    data = request.json
-    
-    # Path to Obsidian vault to save file
-    vault_path = common.fabai_common_variables.OBSIDIAN_VAULT_PATH
-    
-    # File name of note; Example "Test Python Note"
-    file_name = data.get('file_name')
-    
-    # Note header; Example "My Automated Note"
-    note_header = data.get('note_header')
+@app.route('/submit_note', methods=['POST'])
+def submit_note():
+    # Get form data from the request
+    file_name = request.form.get('file_name')
+    note_header = request.form.get('note_header')
+    note_content = request.form.get('note_content')
+    tags = request.form.get('tags')  # Assuming tags are comma-separated
+    related_notes = request.form.get('related_notes')  # Assuming related notes are comma-separated
 
-    # Content of note; "This is the content of the note."
-    note_content = data.get('note_content') 
-    
-    # Tags for search; example ["python", "automation"]
-    tags = data.get('tags') 
-    
-    # Example ["Another Note", "Related Note"]
-    related_notes = data.get('related_notes') 
-    
-    # Validate required parameters
+    # Validate the required form fields
     if not file_name or not note_header or not note_content:
-        app.logger.error("Missing required parameters: file_name, note_header, or note_content.")
-        return jsonify({"status": "error", "message": "Missing required parameters."}), 400
+        return jsonify({"status": "error", "message": "All fields are required."}), 400
 
-    # Create the note
-    if create_note(vault_path, file_name, note_header, note_content, tags=tags, related_notes=related_notes):
-        return jsonify({"status": "success", "message": "Note created."}), 201
-    else:
-        return jsonify({"status": "error", "message": "Failed to create note."}), 500
+    # Prepare the payload to be sent to the Obsidian API
+    payload = {
+        'file_name': file_name,
+        'note_header': note_header,
+        'note_content': note_content,
+        'tags': tags.split(','),  # Convert tags string into a list
+        'related_notes': related_notes.split(',')  # Convert related_notes string into a list
+    }
+
+    try:
+        # Call the Obsidian API at /save_to_obsidian
+        response = requests.post(OBSIDIAN_API_PATH, json=payload)
+
+        # If the response from Obsidian is successful, return the success message
+        if response.status_code == 201:
+            return jsonify({"status": "success", "message": "Note saved successfully."}), 201
+
+        # Handle error responses from the Obsidian API
+        else:
+            return jsonify({"status": "error", "message": response.json().get('message', 'Failed to save note.')}), 500
+
+    except requests.exceptions.RequestException as e:
+        app.logger.error(f"Error calling Obsidian API: {e}")
+        return jsonify({"status": "error", "message": "Failed to save note due to server error."}), 500
+
 
 
 if __name__ == '__main__':

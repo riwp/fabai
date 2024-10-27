@@ -26,8 +26,25 @@ from obsidian_note import *
 
 app = Flask(__name__)
 
-# Setup logging using the built-in logging module
-logging.basicConfig(level=logging.INFO)
+#location to write logs to
+LOG_PATH = os.path.join(current_directory, 'fabai_api.log')
+
+logging.basicConfig(
+    filename=os.path.expanduser(LOG_PATH),
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+# Console handler for app.logger
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+app.logger.addHandler(console_handler)
+
+
+app.logger.info("Logging has been set up")
+app.logger.info(f"Log Path: {LOG_PATH}")
+
 
 def generate_random_unique_number(start, end):
     return random.randint(start, end)
@@ -35,6 +52,8 @@ def generate_random_unique_number(start, end):
 #primary entry point into application called by web ui
 @app.route('/get_ai_insights', methods=['POST'])
 def get_AI_Insights():
+    
+    app.logger.info("Function called get_AI_Insights")
 
     app.logger.info(f"DEBUG_CODE_VALUE={common.fabai_common_variables.DEBUG_CODE_VALUE}, DEBUG_STATIC_FABRIC_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_FABRIC_RESPONSE_VALUE}, DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE}")
 
@@ -64,11 +83,13 @@ def get_AI_Insights():
     if common.fabai_common_variables.DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE:
         app.logger.info(f"Returning static data")
         
-        payload['filename'] = None
-        payload['output'] = get_static_debug_data(DEBUG_STATIC_VIDEO_FILE)
+        payload = {
+            'filename': 'static',
+            'output': get_static_debug_data(DEBUG_STATIC_VIDEO_FILE)
+            }
 
         return jsonify(payload)
-        
+      
     #if content type is video, get the youtube transcript and then pass it to fabric
     if function == 'aivideo':
         app.logger.info(f"calling get_youtubevideo_transcript with URL: {url}")
@@ -119,15 +140,45 @@ def save_to_obsidian():
     related_notes = data.get('related_notes')
 
     # Validate required parameters
-    if not file_name or not note_header or not note_content:
+    if not file_name or not note_content:
         app.logger.error("Missing required parameters: file_name, note_header, or note_content.")
         return {"status": "error", "message": "Missing required parameters."}, 400
 
-    # Create the note
-    if create_note(vault_path, file_name, note_header, note_content, tags=tags, related_notes=related_notes):
-        return {"status": "success", "message": "Note created."}, 201
-    else:
+    # Ensure the vault directory exists
+    if not os.path.exists(vault_path):
+        app.logger.error(f"Vault path does not exist: {vault_path}")
+        return {"status": "error", "message": "Vault path does not exist"}, 400
+
+    # Prepare the final note content
+    final_note_content = f"# {note_header}\n\n{note_content}\n\n"
+
+    # Add tags
+    if tags:
+        final_note_content += "Tags: " + ", ".join(tags) + "\n"
+
+    # Add related notes
+    if related_notes:
+        final_note_content += "Related Notes: " + ", ".join(related_notes) + "\n"
+
+    # Define the complete file path
+    file_path = os.path.join(vault_path, f"{file_name}.md")
+
+    # Create and write the note
+    try:
+        with open(file_path, 'w') as note_file:
+            note_file.write(final_note_content)
+            app.logger.info(f"Note created: {file_path}")
+            return {"status": "success", "message": "Note created."}, 201
+    except Exception as e:
+        app.logger.error(f"Failed to create note: {e}")
         return {"status": "error", "message": "Failed to create note."}, 500
+
+
+
+
+
+
+
 
 
 
@@ -158,4 +209,5 @@ def test_AI_Insights():
 
 
 if __name__ == '__main__':
+    app.logger.info("Application loading")
     app.run(host='0.0.0.0', port=API_PORT_NUMBER, debug=True)
