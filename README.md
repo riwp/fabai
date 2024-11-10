@@ -38,6 +38,22 @@ sudo tar -xvf go1.23.3.linux-amd64.tar.gz -C /usr/local/
     # Install Fabric directly from the repo
     go install github.com/danielmiessler/fabric@latest
 
+
+3b.  copy export paths so they dont get overwritten at reboot
+
+nano ~/.bashrc  # or ~/.zshrc if you're using zsh
+--> put paths at the end of the file
+
+export PATH=$PATH:/usr/local/go/bin
+
+# Golang environment variables
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+
+# Update PATH to include GOPATH and GOROOT binaries
+export PATH=$GOPATH/bin:$GOROOT/bin:$HOME/.local/bin:$PATH
+
+
 4. Install chromium-browser
     Used in headless mode to download web page content from a URL
 
