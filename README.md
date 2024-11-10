@@ -9,6 +9,9 @@ Install pre-requisites
     Required to install fabric
     https://go.dev/doc/install
 
+wget https://go.dev/dl/go1.23.3.linux-amd64.tar.gz
+sudo tar -xvf go1.23.3.linux-amd64.tar.gz -C /usr/local/
+
     STEPS:
     Download latest distro:
     https://go.dev/dl/
