@@ -13,7 +13,7 @@ def get_webpage_as_text(url):
 
     # Validate that the URL is provided
     if not url:
-        raise GetWebError("error: URL is required")
+        raise ValueError("error: URL is required")
 
     try:
         # Execute the command to get the HTML content, pipe it to html2text
@@ -26,14 +26,14 @@ def get_webpage_as_text(url):
         )
 
         if result.returncode != 0:
-            app.logger.error(f"Command failed: {result.stderr.strip()}")
-            raise GetWebError({"error": f"Command failed: {result.stderr.strip()}"})
+            logger.log_exception(f"Command failed: {result.stderr.strip()}")
+            raise ValueError({"error": f"Command failed: {result.stderr.strip()}"})
 
         return result.stdout.strip()
 
     except Exception as e:
-        app.logger.error(f"Error occurred: {e}")
-        raise GetWebError({"error": f"An error occurred: {str(e)}"})
+        logger.log_exception(f"Error occurred: {e}")
+        raise ValueError({"error": f"An error occurred: {str(e)}"})
 
 #add entry point that can be called via CURL to test in isolation
 @app.route('/test_get_webpage_as_text', methods=['POST'])

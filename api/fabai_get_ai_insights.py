@@ -26,36 +26,16 @@ from obsidian_note import *
 
 app = Flask(__name__)
 
-#location to write logs to
-LOG_PATH = os.path.join(current_directory, 'fabai_api.log')
-
-logging.basicConfig(
-    filename=os.path.expanduser(LOG_PATH),
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
-# Console handler for app.logger
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-console_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-app.logger.addHandler(console_handler)
-
-
-app.logger.info("Logging has been set up")
-app.logger.info(f"Log Path: {LOG_PATH}")
-
-
 def generate_random_unique_number(start, end):
     return random.randint(start, end)
 
 #primary entry point into application called by web ui
 @app.route('/get_ai_insights', methods=['POST'])
 def get_AI_Insights():
-    
-    app.logger.info("Function called get_AI_Insights")
+  
+    logger.log_info("Function called get_AI_Insights")
 
-    app.logger.info(f"DEBUG_CODE_VALUE={common.fabai_common_variables.DEBUG_CODE_VALUE}, DEBUG_STATIC_FABRIC_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_FABRIC_RESPONSE_VALUE}, DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE}")
+    logger.log_info(f"DEBUG_CODE_VALUE={DEBUG_CODE_VALUE}, DEBUG_STATIC_FABRIC_RESPONSE_VALUE={DEBUG_STATIC_FABRIC_RESPONSE_VALUE}, DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE={DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE}")
 
     data = request.json
     
@@ -72,7 +52,7 @@ def get_AI_Insights():
     
     filename = data.get('filename')
        
-    app.logger.info(f"Received request: function={function}, operation_type={operation_type}, url={url}, text_input={text_input}")
+    logger.log_info(f"Received request: function={function}, operation_type={operation_type}, url={url}, text_input={text_input}")
 
     payload = {
         'filename': None,
@@ -80,8 +60,8 @@ def get_AI_Insights():
     }
 
     #If Debugging is on, return static content   
-    if common.fabai_common_variables.DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE:
-        app.logger.info(f"Returning static data")
+    if DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE:
+        logger.log_info(f"Returning static data")
         
         payload = {
             'filename': 'static',
@@ -92,7 +72,7 @@ def get_AI_Insights():
       
     #if content type is video, get the youtube transcript and then pass it to fabric
     if function == 'aivideo':
-        app.logger.info(f"calling get_youtubevideo_transcript with URL: {url}")
+        logger.log_info(f"calling get_youtubevideo_transcript with URL: {url}")
         youtube_transcript = get_youtubevideo_transcript(url)
         fabric_response = get_fabric_insights_from_text(function, operation_type, os.path.basename(url), youtube_transcript)
 
@@ -101,7 +81,7 @@ def get_AI_Insights():
 
     #if content type is web, get the web html, clean it up, and then pass it to fabric
     elif function == 'aiweb':
-        app.logger.info(f"calling get_webpage_as_text with URL: {url}")
+        logger.log_info(f"calling get_webpage_as_text with URL: {url}")
         web_text = get_webpage_as_text(url)
         fabric_response = get_fabric_insights_from_text(function, operation_type, os.path.basename(url), web_text)
         
@@ -109,7 +89,7 @@ def get_AI_Insights():
     
         #if content type is web, get the web html, clean it up, and then pass it to fabric
     elif function == 'textInput':
-        app.logger.info(f"calling fabric with text {text_input}")
+        logger.log_info(f"calling fabric with text {text_input}")
         
         unique_number = generate_random_unique_number(1000, 9999)  # Generates a random number between 1000 and 9999
         file_name = filename + str(unique_number)
@@ -141,12 +121,12 @@ def save_to_obsidian():
 
     # Validate required parameters
     if not file_name or not note_content:
-        app.logger.error("Missing required parameters: file_name, note_header, or note_content.")
+        logger.log_exception("Missing required parameters: file_name, note_header, or note_content.")
         return {"status": "error", "message": "Missing required parameters."}, 400
 
     # Ensure the vault directory exists
     if not os.path.exists(vault_path):
-        app.logger.error(f"Vault path does not exist: {vault_path}")
+        logger.log_exception(f"Vault path does not exist: {vault_path}")
         return {"status": "error", "message": "Vault path does not exist"}, 400
 
     # Prepare the final note content
@@ -167,10 +147,10 @@ def save_to_obsidian():
     try:
         with open(file_path, 'w') as note_file:
             note_file.write(final_note_content)
-            app.logger.info(f"Note created: {file_path}")
+            logger.log_info(f"Note created: {file_path}")
             return {"status": "success", "message": "Note created."}, 201
     except Exception as e:
-        app.logger.error(f"Failed to create note: {e}")
+        logger.log_exception(f"Failed to create note: {e}")
         return {"status": "error", "message": "Failed to create note."}, 500
 
 
@@ -186,7 +166,7 @@ def save_to_obsidian():
 @app.route('/test_ai_insights', methods=['POST'])
 def test_AI_Insights():
 
-    app.logger.info(f"DEBUG_CODE_VALUE={common.fabai_common_variables.DEBUG_CODE_VALUE}, DEBUG_STATIC_FABRIC_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_FABRIC_RESPONSE_VALUE}, DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE}")
+    logger.log_info(f"DEBUG_CODE_VALUE={common.fabai_common_variables.DEBUG_CODE_VALUE}, DEBUG_STATIC_FABRIC_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_FABRIC_RESPONSE_VALUE}, DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE={common.fabai_common_variables.DEBUG_STATIC_YOUTUBE_RESPONSE_VALUE}")
 
     data = request.json
     
@@ -203,11 +183,11 @@ def test_AI_Insights():
     
     filename = data.get('filename')
        
-    app.logger.info(f"Received request (test_ai_insights): function={function}, operation_type={operation_type}, url={url}, text_input={text_input}")
+    logger.log_info(f"Received request (test_ai_insights): function={function}, operation_type={operation_type}, url={url}, text_input={text_input}")
 
     return jsonify({"output": get_static_debug_data(DEBUG_STATIC_VIDEO_FILE)})
 
 
 if __name__ == '__main__':
-    app.logger.info("Application loading")
+    logger.log_info("Application loading")
     app.run(host='0.0.0.0', port=API_PORT_NUMBER, debug=True)

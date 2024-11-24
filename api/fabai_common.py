@@ -2,14 +2,16 @@ from flask import Flask, request, jsonify
 import logging
 import os, sys
 import subprocess
-import common.fabai_common_variables
+from common.fabai_common_variables import *
+
+from common.Logger import Logger
 
 #allow toggle on/off debugging from IDE
 DEBUG_CODE = False
 #common.fabai_common_variables.DEBUG_CODE_VALUE
 
 if DEBUG_CODE: 
-    DEBUG_PORT = common.fabai_common_variables.DEBUG_PORT_GETINSIGHTS_VALUE
+    DEBUG_PORT = DEBUG_PORT_GETINSIGHTS_VALUE
     import debugpy
     # Listen for the VS Code debugger to attach on port 5678
     debugpy.listen(("0.0.0.0", DEBUG_PORT))
@@ -50,3 +52,13 @@ operation_mapping = {
     "essay": "write_micro_essay",
     "wisdom": "extract_wisdom"
 }
+
+
+LOG_PATH = os.path.join(API_LOG_PATH, 'api.log') 
+
+#create a logger instance
+logger = Logger(app=app, log_path=LOG_PATH, log_level=logging.DEBUG)
+
+logger.log_info("Log initialized - Info Test")
+logger.log_exception("Log initialized - exception Test")
+

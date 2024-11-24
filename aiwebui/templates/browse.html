@@ -1,151 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Browser</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            margin-top: 50px;
-            max-width: 100%;
-        }
-        h1 {
-            font-size: 2.5rem;
-        }
-        .form-group {
-            width: 100%;
-        }
-        #fileContent {
-            width: 100%;
-            word-wrap: break-word;
-            word-break: break-word;
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-            font-size: 1.2rem;
-            margin-top: 0;
-            padding-top: 10px;
-            border: 1px solid #ccc;
-            background: #f9f9f9;
-            padding: 10px;
-        }
-        label {
-            font-size: 1.25rem;
-        }
-        .form-control {
-            font-size: 1.2rem;
-        }
-        select.form-control {
-            height: calc(2.5rem + 2px);
-        }
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.75rem;
-            }
-            #fileContent {
-                font-size: 1rem;
-            }
-        }
-    </style>
-    <script>
-        // Function to fetch file content
-        function fetchFileContent() {
-            const file = document.getElementById('file').value;
-            const category = document.getElementById('category').value;
-
-            if (!file) {
-                return; // Do nothing if no file is selected
-            }
-
-            fetch(`/files/${encodeURIComponent(category)}/${encodeURIComponent(file)}/content`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('fileContent').textContent = data;
-                })
-                .catch(error => {
-                    console.error('Error fetching file content:', error);
-                });
-        }
-
-        // Reload the page with the new category, then fetch the file content
-        function fetchFiles() {
-            const category = document.getElementById('category').value;
-            window.location.href = `/browse?category=${category}`;
-        }
-
-        // Trigger the file content fetch when the file changes
-        function handleFileChange() {
-            fetchFileContent();
-        }
-
-        // Wait until the DOM is fully loaded, then fetch the content of the first file automatically
-        document.addEventListener('DOMContentLoaded', function () {
-            const fileDropdown = document.getElementById('file');
-            if (fileDropdown) {
-                fetchFileContent(); // Fetch content for the first file if it exists
-            }
-        });
-    </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Files</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+      body {
+          background-color: #f8f9fa;
+      }
+      .container {
+          margin-top: 50px;
+          max-width: 100%;
+      }
+      h1 {
+          font-size: 2.5rem;
+      }
+      .form-group, .btn {
+          width: 100%;
+      }
+      #result {
+          width: 100%;
+          word-wrap: break-word;
+          word-break: break-word;
+          white-space: pre-wrap;
+          overflow-wrap: break-word;
+          font-size: 1.2rem;
+          margin-top: 0;
+          padding-top: 10px;
+      }
+      label {
+          font-size: 1.25rem;
+      }
+      .form-control, .btn {
+          font-size: 1.2rem;
+      }
+      select.form-control {
+          height: calc(2.5rem + 2px);
+      }
+      .error-message {
+          color: red;
+          font-size: 0.9rem;
+          margin-top: 5px;
+          display: none;
+      }
+      @media (max-width: 768px) {
+          h1 {
+              font-size: 1.75rem;
+          }
+          #result {
+              font-size: 1rem;
+          }
+      }
+      .expandable-header {
+          font-size: 1rem;
+          cursor: pointer;
+          padding: 10px;
+          background-color: #f2f2f2;
+          border: 1px solid #ccc;
+          margin: 10px 0;
+      }
+      .expandable-content {
+          padding: 15px;
+          border: 1px solid #ccc;
+          margin-bottom: 10px;
+          display: none; /* Initially hidden */
+      }
+      .visible {
+          display: block; /* Show content when visible */
+      }
+      .general-content {
+          padding: 15px;
+          border: 1px solid #ccc;
+          margin-bottom: 10px;
+      }
+      /* Modal background */
+      .modal {
+          display: none; /* Hidden by default */
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+      }
+      
+      /* Modal content */
+      .modal-content {
+          position: relative;
+          margin: 10% auto;
+          padding: 20px;
+          width: 400px; /* Increase width for a wider window */
+          background-color: #fff;
+          border-radius: 8px;
+          text-align: center;
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      /* Title styling - smaller font size */
+      #alertTitle {
+          font-size: 22px; /* Smaller title font */
+          font-weight: bold;
+          color: #333;
+          margin-bottom: 10px;
+      }
+      
+      /* Message styling - larger font size */
+      #alertMessage {
+          font-size: 18px; /* Larger message font */
+          color: #555;
+          margin-bottom: 20px;
+      }
+      
+      /* Close button */
+      .close-btn {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          font-size: 20px;
+          cursor: pointer;
+          color: #888;
+      }
+      
+      .close-btn:hover {
+          color: #000;
+      }
+      
+      /* Button styling */
+      .modal-content button {
+          padding: 8px 16px;
+          font-size: 16px;
+          background-color: #007bff;
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+      }
+      
+      .modal-content button:hover {
+          background-color: #0056b3;
+      }
+  
+  </style>
 </head>
-
 <body>
     <div class="container">
-        <h1 class="text-center">File Browser</h1>
-        <a href="/" class="btn btn-secondary btn-block">Back to Home</a>
+        <a href="/">Analyze Content</a>
+        <h1 class="text-center">Let's Browse Some Files</h1>
 
-        <!-- Dropdown to select category (Video, Web, Text) -->
-        <form method="GET" action="/browse">
+        <div id="ai-inputs" class="general-content">
             <div class="form-group">
-                <label for="category">Select Category:</label>
-                <select name="category" id="category" onchange="fetchFiles()" required>
-                    <option value="video" {% if selected_category == 'video' %} selected {% endif %}>Video</option>
-                    <option value="web" {% if selected_category == 'web' %} selected {% endif %}>Web</option>
-                    <option value="text" {% if selected_category == 'text' %} selected {% endif %}>Text</option>
-                </select>
-            </div>
-        </form>
-
-        <br>
-
-        <!-- Form for renaming files -->
-        <form action="/rename" method="POST">
-            <div class="form-group">
-                <label for="file">Select File to Rename:</label>
-                <select name="oldname" id="file" onchange="handleFileChange()" required>
-                    {% for file in files %}
-                    <option value="{{ file }}">{{ file }}</option>
-                    {% endfor %}
-                </select>
+                <label for="search-tags">Search Tags:</label>
+                <input type="text" id="search-tags" placeholder="Enter tags to search...">
+                <button id="search-btn">Go</button>
             </div>
 
-            <!-- Area to display file content -->
-            <h2>File Content:</h2>
-            <pre id="fileContent"></pre>
-
             <div class="form-group">
-                <label for="newname">New Name:</label>
-                <input type="text" id="newname" name="newname" required class="form-control">
+                <h2>Search Results</h2>
+                <ul id="file-list">
+                    <!-- Dynamically generated file list will appear here -->
+                </ul>
             </div>
 
-            <!-- Hidden field to pass the selected category -->
-            <input type="hidden" name="category" value="{{ selected_category }}">
-            <input type="hidden" name="currentfiledirectory" value="{{ currentfiledirectory }}">
-
-            <button type="submit" class="btn btn-success">Rename File</button>
-        </form>
-
-        <!-- Optionally display messages -->
-        {% if message %}
-            <p>{{ message }}</p>
-        {% endif %}
+            <div class="form-group">
+                <h2>File Content</h2>
+                <textarea id="file-content" class="form-control" rows="20" cols="50"></textarea>
+            </div>
+        </div>
     </div>
+  <script>
+    document.getElementById('search-btn').addEventListener('click', function() {
+        const searchTags = document.getElementById('search-tags').value.trim();
+        // Allow empty tags to return all files
+        fetch(`/search_files?tags=${encodeURIComponent(searchTags)}`)
+          .then(response => response.json())
+          .then(data => {
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = ''; // Clear existing results
+            if (data.files && data.files.length > 0) {
+              data.files.forEach(file => {
+                const listItem = document.createElement('li');
+                listItem.textContent = file;
+                listItem.style.cursor = 'pointer'; // Make the file name clickable
+                listItem.addEventListener('click', function() {
+                  loadFileContent(file);
+                });
+                fileList.appendChild(listItem);
+              });
+            } else {
+              fileList.innerHTML = '<li>No files found matching the tags.</li>';
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching files:', error);
+            alert('An error occurred while fetching files.');
+          });
+      });
+      
+
+    function loadFileContent(file) {
+      fetch(`/get_file_content?file=${encodeURIComponent(file)}`)
+        .then(response => response.text())
+        .then(content => {
+          document.getElementById('file-content').value = content;
+        })
+        .catch(error => {
+          console.error('Error loading file content:', error);
+          alert('An error occurred while loading the file content.');
+        });
+    }
+  </script>
 </body>
 </html>

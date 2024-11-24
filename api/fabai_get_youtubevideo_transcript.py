@@ -14,7 +14,7 @@ class GetTranscriptError(Exception):
 #gets youtube video transcript
 def get_youtubevideo_transcript(url):
     if not url:
-        app.logger.error("No URL provided in request.")
+        logger.log_exception("No URL provided in request.")
         raise GetTranscriptError("error: URL is required")
 
     # Temporary subtitle filename
@@ -31,15 +31,15 @@ def get_youtubevideo_transcript(url):
         url
     ]
 
-    app.logger.info(f"Running command: {' '.join(yt_dlp_command)}")
+    logger.log_info(f"Running command: {' '.join(yt_dlp_command)}")
 
     try:
         # Run the command and capture output
         result = subprocess.run(yt_dlp_command, check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
-        app.logger.error(f"yt-dlp command failed: {e}")
-        app.logger.error(f"Command output: {e.output}")
-        app.logger.error(f"Error message: {e.stderr}")
+        logger.log_exception(f"yt-dlp command failed: {e}")
+        logger.log_exception(f"Command output: {e.output}")
+        logger.log_exception(f"Error message: {e.stderr}")
         raise GetTranscriptError("error: Failed to download subtitles")
 
     # Check if the subtitle file was created successfully
@@ -53,7 +53,7 @@ def get_youtubevideo_transcript(url):
         # Return the subtitle content
         return subtitle_content
 
-    app.logger.error("Subtitle file not created.")
+    logger.log_exception("Subtitle file not created.")
     raise GetTranscriptError("error: Subtitle file not created")
 
 #add entry point that can be called via CURL to test in isolation

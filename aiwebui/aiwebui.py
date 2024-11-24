@@ -6,12 +6,27 @@ import sys
 import json
 
 # Add the parent directory to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+# Print the absolute paths to verify they are correct
+print("Current working directory:", os.getcwd())
+print("sys.path:", sys.path)
+
+# Add the parent directory to sys.path (if needed)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Confirm the path for the common directory
+common_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'common'))
+print("Resolved path for 'common':", common_path)
+
+# Try importing
 from common.fabai_common_variables import *
+
 
 # Code to get static text file and returns as stub for testing purposes
 from common.fabai_get_static_debug_data import *
+
+from common.Logger import Logger
 
 # For UI troubleshooting. Return static response as if you called fabric AI
 DEBUG_STATIC_FABRIC_RESPONSE = DEBUG_STATIC_FABRIC_RESPONSE_VALUE
@@ -40,20 +55,19 @@ AIWEBUI_PORT_NUMBER = 5005
 app = Flask(__name__)
 
 # Set the log path to go up one directory and then to the log folder
-LOG_PATH = os.path.join(current_directory, 'fabai_webui.log')
+LOG_PATH = os.path.join(AIWEBUI_LOG_PATH, 'webui.log')
 
-# Setup logging to log to a file
-logging.basicConfig(
-    filename=os.path.expanduser(LOG_PATH),
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logger = Logger(log_path=LOG_PATH, log_level=logging.DEBUG)
+logger.log_info("This is an info log")
+logger.log_error("This is an error log")
+
+
 
 
 @app.route('/')
 def index():
-    #app.logger.info(f'current_directory: {current_directory}')
-    app.logger.info("Rendering index.html")
+    #logger.log_info(f'current_directory: {current_directory}')
+    logger.log_info("Rendering index.html")
    
     return render_template('index.html')
 
@@ -85,7 +99,7 @@ def validate_request(function, operationtype, url, text_input, filename):
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    app.logger.info("Starting submit")
+    logger.log_info("Starting submit")
     # Get form data
     data = request.json
     function = data.get('function')
@@ -94,7 +108,7 @@ def submit():
     text_input = data.get('textInput', "")
     filename = data.get('filename', "")  # Get filename from the request
 
-    app.logger.info(f"Received data: function={function}, operationtype={operationtype}, url={url}, text_input={text_input}, filename={filename}")
+    logger.log_info(f"Received data: function={function}, operationtype={operationtype}, url={url}, text_input={text_input}, filename={filename}")
 
     try:
         if ((DEBUG_STATIC_FABRIC_RESPONSE) or (function=='static')):
@@ -107,14 +121,14 @@ def submit():
 
             output_data = jsonify(payload)
             
-            app.logger.info(f"Using Fabric Static data {DEBUG_STATIC_FABRIC_FILE}")
+            logger.log_info(f"Using Fabric Static data {DEBUG_STATIC_FABRIC_FILE}")
         else:
             # Validate the request
             validation_errors = validate_request(function, operationtype, url, text_input, filename)
 
             # If validation fails, return the error response
             if validation_errors:
-                app.logger.info("Stopping user. Failed validation.")
+                logger.log_info("Stopping user. Failed validation.")
                 return jsonify({'error': 'Validation failed', 'messages': validation_errors}), 400
             
             payload = {
@@ -125,7 +139,7 @@ def submit():
                 'filename': filename  # Include filename in the payload
             }
 
-            app.logger.info(f"Sending payload to API: {payload}")    
+            logger.log_info(f"Sending payload to API: {payload}")    
             
             response = requests.post(FABRIC_AI_API_URL, json=payload)
             response.raise_for_status()
@@ -135,60 +149,20 @@ def submit():
             #filename = data.get('filename', 'No filename received.')
             #output = data.get('output', 'No output received.')
             
-            app.logger.info(f"API response: {output_data}")
+            logger.log_info(f"API response: {output_data}")
 
         return output_data  # Return output as JSON
 
     except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error connecting to API: {e}")
+        logger.log_exception(f"Error connecting to API: {e}")
         return jsonify({"error": f"Error connecting to API: {e}"}), 500  # Return JSON error response
 
 
 
-
-
-
-@app.route('/browse', methods=['GET'])
+# Route for the browse page
+@app.route('/browse.html')
 def browse():
-    """Serve the browse page with a list of files in the selected category."""
-    category = request.args.get('category', 'video')  # Default to 'video' category if not provided
-    file_path = common.fabai_common_variables.OUT_DIRECTORIES.get(category, common.fabai_common_variables.OUT_DIRECTORIES['video'])
-
-    try:
-        # Fetch all files in the selected category directory
-        files = os.listdir(file_path)
-        files_sorted = sorted(files, key=lambda x: os.path.getmtime(os.path.join(file_path, x)), reverse=True)
-
-        message = None
-    except Exception as e:
-        # Log any errors while trying to read the directory
-        files = []
-        message = f"Error accessing files: {str(e)}"
-        app.logger.error(message)
-    
-    # Render the browse page, passing the list of files and the selected category
-    return render_template('browse.html', files=files_sorted, selected_category=category, message=message, currentfiledirectory=file_path)
-
-
-@app.route('/files/<string:category>/<string:filename>/content', methods=['GET'])
-def get_file_content(category, filename):
-    
-    OUT_DIRECTORIES = {'video','web', 'text'}
-    # Check if the category is valid
-    if category not in OUT_DIRECTORIES:
-        return jsonify({'error': 'Invalid category'}), 400
-
-    # Construct the file path based on the category
-    file_path = OUT_DIRECTORIES[category] + filename
-
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-        return content, 200
-    except FileNotFoundError:
-        return jsonify({'error': 'File not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    return render_template('browse.html')
 
 
 @app.route('/submit_note', methods=['POST'])
@@ -227,8 +201,59 @@ def submit_note():
             return jsonify({"status": "error", "message": response.json().get('message', 'Failed to save note.')}), 500
 
     except requests.exceptions.RequestException as e:
-        app.logger.error(f"Error calling Obsidian API: {e}")
+        logger.log_exception(f"Error calling Obsidian API: {e}")
         return jsonify({"status": "error", "message": "Failed to save note due to server error."}), 500
+
+
+
+
+
+
+
+# Route for searching files
+@app.route('/search_files')
+def search_files():
+    tags = request.args.get('tags', '').strip()
+
+    # If no tags are provided, return all files
+    if not tags:
+        all_files = []
+
+        for root, dirs, files in os.walk(OBSIDIAN_VAULT_PATH):
+            for file in files:
+                all_files.append(file)
+
+        return jsonify({"files": all_files})
+
+    # Otherwise, search for files with matching tags
+    matching_files = []
+
+    for root, dirs, files in os.walk(OBSIDIAN_VAULT_PATH):
+        for file in files:
+            file_path = os.path.join(root, file)
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+                if f'Tags: {tags}' in content:  # Adjust according to your tag format
+                    matching_files.append(file_path)
+
+    return jsonify({"files": matching_files})
+
+# Route for getting file content
+@app.route('/get_file_content')
+def get_file_content():
+    file_name = request.args.get('file', '')
+    if not file_name:
+        return "File not found", 404
+
+    file_path = os.path.join(OBSIDIAN_VAULT_PATH, file_name)
+    if not os.path.exists(file_path):
+        return "File not found", 404
+
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+        content = f.read()
+
+    return content
+
 
 
 
